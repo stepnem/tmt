@@ -21,3 +21,7 @@
 /scripts:
     summary: Check test discovery from the execute step
     test: ./scripts.sh
+
+/sources:
+    Summary: Gather and discover from dist-git
+    test: ./sources.sh

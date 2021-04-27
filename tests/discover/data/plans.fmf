@@ -58,3 +58,14 @@ execute:
             ref: 8329db0
             modified-only: true
             modified-ref: 8329db0^
+
+/sources:
+    /url:
+        discover:
+            how: sources
+            url: https://src.fedoraproject.org/rpms/tmt.git
+            # Sources doesn't contain .fmf/version
+            shell: |
+                fmf init
+            delegate:
+                how: fmf
