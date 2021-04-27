@@ -1,3 +1,4 @@
-import yaml
+from ruamel.yaml import YAML
+yaml = YAML(typ='safe')
 with open('tests.fmf') as tests:
-    print(yaml.safe_load(tests)['summary'])
+    print(yaml.load(tests)['summary'])

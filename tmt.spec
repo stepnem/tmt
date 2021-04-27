@@ -52,7 +52,7 @@ BuildRequires: python%{python3_pkgversion}-markdown
 BuildRequires: rsync
 %{?python_provide:%python_provide python%{python3_pkgversion}-%{name}}
 %if %{with oldreqs}
-Requires:       python%{python3_pkgversion}-PyYAML
+Requires:       python%{python3_pkgversion}-ruamel-yaml
 %endif
 
 %description -n python%{python3_pkgversion}-%{name}

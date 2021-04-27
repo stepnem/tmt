@@ -11,9 +11,9 @@ import time
 
 import click
 import fmf
-import yaml
 from fmf.utils import listed
 from click import echo, style
+from ruamel.yaml.error import MarkedYAMLError
 
 import tmt.export
 import tmt.steps
@@ -542,7 +542,7 @@ class Plan(Node):
                         raise tmt.utils.GeneralError(
                             f"Invalid step data for {step}: '{data}'.")
                     step_data.append(data)
-                except yaml.parser.ParserError as error:
+                except MarkedYAMLError as error:
                     raise tmt.utils.GeneralError(
                         f"Invalid yaml data for {step}:\n{error}")
 

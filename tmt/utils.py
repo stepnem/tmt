@@ -16,10 +16,11 @@ from threading import Timer
 
 import fmf
 import requests
-import yaml
 from click import style, echo, wrap_text
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from ruamel.yaml import YAML, scalarstring
+from ruamel.yaml.comments import CommentedMap
 
 log = fmf.utils.Logging('tmt').logger
 
@@ -754,33 +755,28 @@ def context_to_dict(context):
 def dict_to_yaml(data, width=None, sort=False):
     """ Convert dictionary into yaml """
     output = io.StringIO()
-    yaml.safe_dump(
-        data, output, sort_keys=sort,
-        encoding='utf-8', allow_unicode=True,
-        width=width, indent=4, default_flow_style=False)
+    yaml = YAML()
+    yaml.indent(mapping=4, sequence=4, offset=2)
+    yaml.default_flow_style = False
+    yaml.allow_unicode = True
+    yaml.encoding = 'utf-8'
+    yaml.width = width
+    # Convert multiline strings
+    scalarstring.walk_tree(data)
+    if sort:
+        # Sort the data https://stackoverflow.com/a/40227545
+        sorted_data = CommentedMap()
+        for key in sorted(data):
+            sorted_data[key] = data[key]
+        data = sorted_data
+    yaml.dump(data, output)
     return output.getvalue()
-
-# FIXME: Temporary workaround for rhel-8 to disable key sorting
-# https://stackoverflow.com/questions/31605131/
-# https://github.com/psss/tmt/issues/207
-try:
-    output = dict_to_yaml(dict(one=1, two=2, three=3))
-except TypeError:
-    representer = lambda self, data: self.represent_mapping(
-        'tag:yaml.org,2002:map', data.items())
-    yaml.add_representer(dict, representer, Dumper=yaml.SafeDumper)
-    def dict_to_yaml(data, width=None, sort=False):
-        """ Convert dictionary into yaml (ignore sort) """
-        output = io.StringIO()
-        yaml.safe_dump(
-            data, output, encoding='utf-8', allow_unicode=True,
-            width=width, indent=4, default_flow_style=False)
-        return output.getvalue()
 
 
 def yaml_to_dict(data):
     """ Convert yaml into dictionary """
-    return yaml.safe_load(data)
+    yaml = YAML()
+    return yaml.load(data)
 
 
 def markdown_to_html(filename):

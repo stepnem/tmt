@@ -3,10 +3,10 @@ import shutil
 import tempfile
 from pathlib import Path
 
-import yaml
 from fmf import Tree
 from click.testing import CliRunner
 from requre import RequreTestCase
+from ruamel.yaml import YAML
 
 import tmt.base
 import tmt.cli
@@ -85,7 +85,8 @@ class NitrateImport(Base):
         self.assertIn("/Manual/Imported_Test_Case/main.fmf", filename)
         self.assertTrue(Path(filename).exists())
         with open(Path(filename)) as file:
-            out = yaml.safe_load(file)
+            yaml = YAML(typ='safe')
+            out = yaml.load(file)
             self.assertIn("Tier1", out["tag"])
             self.assertIn("tmt_test_component", out["component"])
 
@@ -177,6 +178,7 @@ extra-task: /tmt/integration
             self.assertIn(self.test_md_content, file.read())
         self.assertIn("main.fmf", files)
         with open("main.fmf") as file:
-            generated = yaml.safe_load(file)
-            referenced = yaml.safe_load(self.main_fmf_content)
+            yaml = YAML(typ='safe')
+            generated = yaml.load(file)
+            referenced = yaml.load(self.main_fmf_content)
             self.assertEqual(generated, referenced)
